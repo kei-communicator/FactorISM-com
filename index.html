@@ -1,4 +1,4 @@
-<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#111518"><style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style></head><body><title>数字箱ナビ</title>
+<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#111518"><style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style></head><body><title>『Number.9』をハックしよう(非公認)</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DotGothic16&family=JetBrains+Mono:wght@400;600&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap">
@@ -58,7 +58,9 @@ body {
 }
 .app { max-width: 1180px; margin: 0 auto; display: grid; gap: 14px; }
 header.top { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 6px 16px; }
-h1 { font-family: var(--f-display); font-weight: 400; font-size: 26px; margin: 0; letter-spacing: .03em; }
+h1 { font-family: var(--f-display); font-weight: 400; font-size: clamp(21px, 5.6vw, 28px); line-height: 1.3; margin: 0; letter-spacing: .02em; text-wrap: balance; }
+h1 small, .live-title small { font-size: .6em; color: var(--muted); margin-left: .3em; letter-spacing: 0; }
+.live-title small { color: rgba(255,255,255,.8); }
 .steps { display: flex; gap: 4px; flex-wrap: wrap; }
 .steps button { font: inherit; font-size: 13px; border: 1px solid var(--line); background: var(--sheet); color: var(--muted); border-radius: 99px; padding: 4px 12px; cursor: pointer; }
 .steps button[aria-current="step"] { background: var(--ink); color: var(--sheet); border-color: var(--ink); }
@@ -106,6 +108,20 @@ input[type=file] { position: absolute; width: 1px; height: 1px; opacity: 0; poin
 .sw { display: inline-block; width: 12px; height: 12px; border-radius: 3px; vertical-align: -1px; margin-right: 5px; border: 1px solid var(--edge); }
 .foot { font-size: 12px; color: var(--muted); }
 .demo { font-size: 13px; padding: 8px 12px; border-radius: 8px; background: var(--accent-soft); }
+/* 次の1枚と「置いた」ボタン。狭い画面では画面の下に固定する */
+.next-bar { display: grid; grid-template-columns: 56px minmax(0, 1fr) auto; gap: 12px; align-items: center; padding: 10px 12px; border-radius: 10px;
+  border: 1px solid var(--accent); box-shadow: 0 0 0 1px var(--accent) inset; background: var(--sheet); }
+.next-bar.remove { border-color: var(--warn); box-shadow: 0 0 0 1px var(--warn) inset; background: var(--warn-soft); }
+.next-bar .glyph { width: 56px; height: 56px; }
+.next-bar .txt { min-width: 0; display: grid; gap: 2px; }
+.next-bar .txt b { font-size: 16px; }
+.next-bar .txt span { font-size: 13px; color: var(--muted); }
+.next-bar .btn { min-width: 92px; justify-content: center; }
+@media (max-width: 880px) {
+  .next-bar { position: fixed; left: 0; right: 0; bottom: 0; z-index: 15; border-radius: 14px 14px 0 0; border-width: 1px 0 0;
+    box-shadow: 0 -6px 20px rgba(0, 0, 0, .18);
+    padding: 10px max(16px, env(safe-area-inset-right, 0px)) calc(10px + env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px)); }
+}
 /* ライブ表示 */
 #live { position: fixed; inset: 0; background: #000; z-index: 20; overflow: hidden; }
 #live video, #live canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
@@ -116,7 +132,7 @@ input[type=file] { position: absolute; width: 1px; height: 1px; opacity: 0; poin
 .pill.ok { background: rgba(31, 122, 77, .9); }
 .pill.warn { background: rgba(180, 35, 24, .9); }
 .pill.busy { background: rgba(36, 87, 197, .9); }
-.live-title { font-family: var(--f-display); font-weight: 400; color: #fff; font-size: 18px; text-shadow: 0 1px 3px rgba(0,0,0,.6); }
+.live-title { font-family: var(--f-display); font-weight: 400; color: #fff; font-size: 16px; min-width: 0; text-shadow: 0 1px 3px rgba(0,0,0,.6); }
 .live-sheet { position: absolute; left: 0; right: 0; bottom: 0; background: var(--sheet); color: var(--ink); border-radius: 16px 16px 0 0;
   padding: 14px max(16px, env(safe-area-inset-right, 0px)) calc(env(safe-area-inset-bottom, 0px) + 14px) max(16px, env(safe-area-inset-left, 0px));
   display: grid; gap: 10px; box-shadow: 0 -6px 24px rgba(0,0,0,.25); }
@@ -134,7 +150,7 @@ input[type=file] { position: absolute; width: 1px; height: 1px; opacity: 0; poin
 
 <div class="app">
   <header class="top">
-    <h1>数字箱ナビ</h1>
+    <h1>『Number.9』をハックしよう<small>(非公認)</small></h1>
     <nav class="steps" aria-label="手順">
       <button type="button" data-step="1">1 撮影</button>
       <button type="button" data-step="2">2 四隅</button>
@@ -155,7 +171,7 @@ input[type=file] { position: absolute; width: 1px; height: 1px; opacity: 0; poin
 <div id="live" hidden>
   <video id="cam" playsinline muted autoplay></video>
   <canvas id="ov" aria-label="カメラ映像に重ねた案内"></canvas>
-  <div class="live-top"><span class="live-title">数字箱ナビ</span><span class="pill" id="livePill">準備中</span></div>
+  <div class="live-top"><span class="live-title">『Number.9』をハックしよう<small>(非公認)</small></span><span class="pill" id="livePill">準備中</span></div>
   <div class="live-sheet" id="liveSheet"></div>
 </div>
 
@@ -658,7 +674,7 @@ function render() {
       labelText(p[0] + r * 1.1, p[1] - r * 1.1, String(i + 1));
     });
     ctx.restore();
-    if (S.drag >= 0) drawLoupe(S.corners[S.drag]);
+    if (S.drag >= 0) drawLoupe(S.corners[S.drag], S.drag);
   }
   if (S.step === 3) {
     drawGrid(.45);
@@ -681,18 +697,35 @@ function labelText(x, y, t) {
   ctx.fillStyle = "#fff"; ctx.fillText(t, x, y);
   ctx.restore();
 }
-function drawLoupe(p) {
+function drawLoupe(p, idx) {
   const size = Math.round(Math.min(cv.width, cv.height) * .34), zoom = 3, src = size / zoom;
   const left = p[0] < cv.width / 2;
   const dx = left ? cv.width - size - 10 : 10, dy = 10;
+  const cx = dx + size / 2, cy = dy + size / 2;
+  const ring = Math.max(10, size * .07), lw = Math.max(2, size / 140);
   ctx.save();
   ctx.beginPath(); ctx.rect(dx, dy, size, size); ctx.clip();
   ctx.drawImage(S.img, (p[0] - src / 2) * (S.img.naturalWidth || S.img.width) / cv.width, (p[1] - src / 2) * (S.img.naturalHeight || S.img.height) / cv.height,
     src * (S.img.naturalWidth || S.img.width) / cv.width, src * (S.img.naturalHeight || S.img.height) / cv.height, dx, dy, size, size);
-  ctx.strokeStyle = "#fff"; ctx.lineWidth = 2;
-  ctx.beginPath(); ctx.moveTo(dx + size / 2, dy); ctx.lineTo(dx + size / 2, dy + size); ctx.moveTo(dx, dy + size / 2); ctx.lineTo(dx + size, dy + size / 2); ctx.stroke();
+  // 十字（中心の丸の内側は空けて、角そのものが見えるようにする）
+  const cross = () => {
+    ctx.beginPath();
+    ctx.moveTo(cx, dy); ctx.lineTo(cx, cy - ring); ctx.moveTo(cx, cy + ring); ctx.lineTo(cx, dy + size);
+    ctx.moveTo(dx, cy); ctx.lineTo(cx - ring, cy); ctx.moveTo(cx + ring, cy); ctx.lineTo(dx + size, cy);
+    ctx.stroke();
+  };
+  ctx.strokeStyle = "rgba(0,0,0,.45)"; ctx.lineWidth = lw + 2; cross();
+  ctx.strokeStyle = "#fff"; ctx.lineWidth = lw; cross();
+  // 角の位置を示す丸（写真上の丸と同じ見た目）
+  ctx.beginPath(); ctx.arc(cx, cy, ring, 0, Math.PI * 2);
+  ctx.fillStyle = "rgba(36,87,197,.22)"; ctx.fill();
+  ctx.strokeStyle = "rgba(0,0,0,.45)"; ctx.lineWidth = lw + 2; ctx.stroke();
+  ctx.strokeStyle = "#fff"; ctx.lineWidth = lw; ctx.stroke();
+  ctx.beginPath(); ctx.arc(cx, cy, Math.max(1.5, lw * .8), 0, Math.PI * 2);
+  ctx.fillStyle = "#fff"; ctx.fill();
   ctx.restore();
   ctx.save(); ctx.strokeStyle = css("--accent"); ctx.lineWidth = 3; ctx.strokeRect(dx, dy, size, size); ctx.restore();
+  if (idx != null) labelText(dx + ring * 1.6, dy + ring * 1.6, String(idx + 1));
 }
 function drawPlanOnPhoto() {
   const plan = currentPlan();
@@ -801,6 +834,7 @@ function photoButtons() {
 }
 function renderPanel() {
   panel.textContent = "";
+  document.querySelector(".app").style.paddingBottom = "";
   hint.hidden = true;
   if (S.step === 1) {
     hint.hidden = false; hint.textContent = "撮影の例";
@@ -817,7 +851,6 @@ function renderPanel() {
       S.liveError ? h("div", { class: "status warn" }, h("span", {}, S.liveError)) : null,
     ));
   }  if (S.step === 2) {
-    hint.hidden = false; hint.textContent = "丸をドラッグして、枠の内側の角に合わせる";
     panel.append(h("div", { class: "card" },
       h("h2", {}, "枠の内側の四隅に合わせる"),
       h("p", {}, "4つの丸を、ピースが入る部分の角に合わせてください。①が左上、時計回りに②③④です。格子がマスの境目に重なれば合っています。"),
@@ -886,25 +919,20 @@ function renderResult() {
       h("button", { type: "button", "aria-pressed": S.mode === "all", on: { click: () => { S.mode = "all"; renderPanel(); render(); } } }, "全部")),
     flipSeg(() => { renderPanel(); render(); }));
 
-  const list = h("div", { class: "list" });
-  const item = (p, kind, isNext) => {
+  // 「次の1枚」のときだけ、次にやることとボタンを1つの帯にまとめる
+  let bar = null;
+  if (!done && S.mode === "next") {
+    const kind = plan.remove.length ? "remove" : "add";
+    const p = kind === "remove" ? plan.remove[0] : plan.add[0];
     const opts = plan.labels.get(p.key);
     const title = kind === "remove" ? `${digitsText(opts)}を外す` : `${digitsText(opts)}を置く`;
-    const sub = kind === "remove" ? "写真で赤くなっている場所のピースを取り出します。" : `${placeText(opts)}。写真で色がついた場所へ。`;
-    return h("div", { class: "step-item" + (kind === "remove" ? " remove" : "") + (isNext ? " next" : "") }, glyph(p, kind === "remove", opts[0]), h("div", { class: "txt" }, h("b", {}, title), h("span", {}, sub)));
-  };
-  let nextAction = null;
-  if (!done) {
-    if (S.mode === "next") {
-      if (plan.remove.length) { list.append(item(plan.remove[0], "remove", true)); nextAction = { kind: "remove", p: plan.remove[0] }; }
-      else { list.append(item(plan.add[0], "add", true)); nextAction = { kind: "add", p: plan.add[0] }; }
-    } else {
-      plan.remove.forEach(p => list.append(item(p, "remove")));
-      plan.add.forEach(p => list.append(item(p, "add")));
-    }
+    const sub = kind === "remove" ? "赤くなっている場所のピースを取り出します。" : `${placeText(opts)}。色がついた場所へ。`;
+    bar = h("div", { class: "next-bar" + (kind === "remove" ? " remove" : "") },
+      glyph(p, kind === "remove", opts[0]),
+      h("div", { class: "txt" }, h("b", {}, title), h("span", {}, sub)),
+      h("button", { class: "btn primary", type: "button", on: { click: () => applyAction({ kind, p }) } }, kind === "remove" ? "外した" : "置いた"));
   }
   const actions = h("div", { class: "row" });
-  if (nextAction) actions.append(h("button", { class: "btn primary", type: "button", on: { click: () => applyAction(nextAction) } }, nextAction.kind === "remove" ? "外した" : "置いた"));
   if (total > 1 && !done) actions.append(h("button", { class: "btn", type: "button", on: { click: () => { S.candIdx = (S.candIdx + 1) % total; renderPanel(); render(); } } }, `別の完成形（${S.candIdx + 1}/${total.toLocaleString("ja-JP")}）`));
   actions.append(h("label", { class: "btn", for: "fileCam" }, "撮り直す"));
 
@@ -913,7 +941,7 @@ function renderResult() {
     S.demo ? h("div", { class: "demo" }, "サンプル: 完成形の写真のうち、四隅の4枚（9・0・6・8）だけが置いてある想定で案内しています。自分の箱は「撮り直す」から撮影できます。") : null,
     status,
     seg,
-    list,
+    bar,
     actions,
     S.placedByApp.size ? h("p", { class: "foot" }, "「置いた」「外した」はこの画面の中だけで進めています。ずれてきたら撮り直してください。") : null,
   ));
@@ -926,7 +954,14 @@ function renderResult() {
       h("span", {}, h("span", { class: "sw", style: "background:var(--warn)" }), "外す")),
     h("p", { class: "foot" }, "図の上が、①と②の丸を置いた辺です。数字の向きは図の向きのとおりに置いてください。"),
   ));
+  requestAnimationFrame(padForBar);
 }
+// 画面下に固定した帯の分だけ、ページの下に余白を空ける
+function padForBar() {
+  const b = document.querySelector(".next-bar"), app = document.querySelector(".app");
+  app.style.paddingBottom = b && getComputedStyle(b).position === "fixed" ? (b.offsetHeight + 12) + "px" : "";
+}
+window.addEventListener("resize", padForBar);
 function flipSeg(after) {
   return h("div", { class: "seg", role: "group", "aria-label": "裏返し" },
     h("button", { type: "button", "aria-pressed": S.allowFlip, on: { click: () => setAllowFlip(true, after) } }, "裏返しあり"),
